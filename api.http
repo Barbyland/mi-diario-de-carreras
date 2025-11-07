@@ -1,0 +1,30 @@
+### Listar todos
+GET http://localhost:3000/api/entrenamientos
+
+### Crear uno
+POST http://localhost:3000/api/entrenamientos
+Content-Type: application/json
+
+{
+  "fecha":"2025-10-01",
+  "tipo":"Running",
+  "distancia_km":5.0,
+  "duracion":"00:30:15",
+  "descripcion":"Entrenamiento prueba POST",
+  "sentimiento":"Feliz",
+  "intensidad":"Media",
+  "ciclo_menstrual":"Folicular",
+  "alimentacion_previa":"Banana + agua"
+}
+
+### Actualizar (cambiá el ID)
+PUT http://localhost:3000/api/entrenamientos/14
+Content-Type: application/json
+
+{
+  "descripcion":"Actualizado desde VSCode REST Client",
+  "intensidad":"Alta"
+}
+
+### Eliminar (cambiá el ID)
+DELETE http://localhost:3000/api/entrenamientos/14

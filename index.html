@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mi Diario de Carreras</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="icon" href="img/favicon.png" type="image/png" sizes="32x32">
+  <link rel="icon" href="img/favicon.png" type="image/png" sizes="192x192">
+  <link rel="apple-touch-icon" href="img/favicon.png">
+</head>
+<body>
+  <div class="container">
+    <div class="banner-container">
+      <img src="img/banner.png" alt="Banner Mi Diario de Carreras" class="banner" />
+    </div>    
+
+    <!-- =======================
+         FORM
+         ======================= -->
+    <form id="registroForm">
+      <label for="fecha">Fecha:</label>
+      <input type="date" id="fecha" name="fecha" required />
+
+      <label for="tipo">Tipo de actividad:</label>
+      <select id="tipo" name="tipo" required>
+        <option value="Running">Running</option>
+        <option value="Bicicleta">Bicicleta</option>
+        <option value="Caminata">Caminata</option>
+        <option value="Otra">Otra</option>
+      </select>
+
+      <label for="distancia">Distancia (km):</label>
+      <input type="number" id="distancia" name="distancia" step="0.01" required />
+
+      <label for="duracion">Duración (HH:MM:SS o MM:SS):</label>
+      <input
+        type="text" id="duracion" name="duracion" placeholder="00:45:30"
+        pattern="^(\d{2}:\d{2}:\d{2}|\d{1,2}:\d{2})$"
+        title="Usá HH:MM:SS (por ej. 01:05:30) o MM:SS (por ej. 45:30)"
+        required
+      />
+      <p id="duracionError" class="error hidden">Formato de duración inválido.</p>
+      <p id="duracionHint" class="meta">Ej: 00:29:05 o 29:05</p>
+      <p id="paceLive" class="meta hidden"></p>
+      
+      <label for="intensidad">Intensidad:</label>
+      <select id="intensidad" name="intensidad" required>
+        <option value="Baja">Baja</option>
+        <option value="Media">Media</option>
+        <option value="Alta">Alta</option>
+      </select>
+
+      <label for="emociones">¿Cómo te sentiste?</label>
+      <select id="emociones" name="emociones" required>
+        <option value="Feliz">Feliz</option>
+        <option value="Cansada">Cansada</option>
+        <option value="Ansiosa">Ansiosa</option>
+        <option value="Con energía">Con energía</option>
+        <option value="Frustrada">Frustrada</option>
+        <option value="Otra">Otra</option>
+      </select>
+
+     <!-- NUEVO: Fase del ciclo menstrual -->
+<label for="ciclo_menstrual">Fase del ciclo menstrual:</label>
+<select id="ciclo_menstrual" name="ciclo_menstrual">
+  <option value="">-- Selecciona --</option>
+  <option value="Folicular">Folicular</option>
+  <option value="Ovulatoria">Ovulatoria</option>
+  <option value="Lutea">Lutea</option>
+  <option value="Menstrual">Menstrual</option>
+</select>
+
+<!-- NUEVO: Alimentacion previa -->
+<label for="alimentacion_previa">Alimentacion previa:</label>
+<textarea id="alimentacion_previa" name="alimentacion_previa" rows="2"
+  placeholder="Ej: tostadas con mermelada, cafe, banana..."></textarea>
+
+
+      <label for="comentarios">Comentarios:</label>
+      <textarea id="comentarios" name="comentarios" rows="3"></textarea>
+
+      <button type="submit">Guardar entrada</button>
+      <button type="button" id="btnCancelEdit" class="btn-secondary hidden">Cancelar</button>
+    </form>
+
+    <!-- =======================
+         LISTA
+         ======================= -->
+         <h2>Mis Registros</h2>
+         <p id="origenDatos" class="meta"></p>
+         <p id="vacio" class="empty-msg">No hay registros todavía.</p>
+         <ul id="listaEntradas"></ul>
+
+    <!-- Vista previa (mock) opcional
+    <section class="preview">
+      <h2>Vista previa (mock)</h2>
+      <p id="preview-error" class="error hidden"></p>
+      <div id="stats"></div>
+      <div id="cards" class="cards"></div>
+    </section>
+    -->
+  </div>
+
+  <!-- Config de la API (debe ir ANTES del módulo) -->
+<script>
+  window.API_BASE = 'http://localhost:3000/api';
+</script>
+
+ <!-- App (ES Modules) -->
+<script type="module" src="ui/index.js"></script>
+
+
+</body>
+</html>

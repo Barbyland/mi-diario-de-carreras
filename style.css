@@ -1,0 +1,426 @@
+:root{
+  --bg: #fff8f4;
+  --card: #fff;
+  --accent: #d45d79;     /* coral título/botón */
+  --accent-2:#a9445f;    /* vino subtítulos */
+  --peach:#ffe5ec;       /* cards suaves */
+  --line:#f0dfe3;
+  --text:#333;
+  --muted:#6b5c64;
+  --focus: rgba(212,93,121,.15);
+  --shadow: 0 10px 24px rgba(180,120,100,.18);
+  --shadow-soft: 0 4px 10px rgba(180,120,100,.14);
+}
+
+/* =========================
+   Base
+   ========================= */
+body{
+  font-family:'Segoe UI',sans-serif;
+  background: radial-gradient(1200px 600px at 50% -100px,#ffeae1 0%, var(--bg) 55%);
+  color:var(--text);
+  max-width:740px; margin:2rem auto; padding:1.5rem;
+  border-radius:16px; box-shadow:var(--shadow);
+}
+
+/* =========================
+   Banner / Logo + Título
+   ========================= */
+.banner-container,
+.logo-container { text-align: center; margin-bottom: 1rem; }
+
+.banner{
+  width:100%;
+  max-width:700px;
+  display:block;
+  margin:0 auto 1rem;
+  border-radius:16px;
+  box-shadow: var(--shadow-soft);
+}
+
+.logo {
+  width: 120px;
+  max-width: 100%;
+  height: auto;
+  border-radius: 12px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+  transition: transform 0.3s ease;
+}
+.logo:hover { transform: scale(1.05); }
+
+h1{
+  text-align:center;
+  color:var(--accent);
+  margin: .25rem 0 2rem;
+  font-size: 2.1rem;
+  letter-spacing:.3px;
+}
+h2{
+  margin-top:2.25rem;
+  color:var(--accent-2);
+  font-weight:700;
+}
+
+/* =========================
+   Formulario
+   ========================= */
+form{ display:flex; flex-direction:column; gap:1rem; }
+
+label{
+  font-weight:600;
+  color:#5c2b3d;
+}
+
+input, select, textarea{
+  padding:.9rem 1rem;
+  border:1px solid var(--line);
+  border-radius:12px;
+  font-size:1rem;
+  background:#fff;
+  outline:none;
+  transition:border-color .2s, box-shadow .2s, transform .02s ease;
+}
+input:focus, select:focus, textarea:focus{
+  border-color:var(--accent);
+  box-shadow:0 0 0 4px var(--focus);
+}
+
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible{
+  outline: none;
+  box-shadow: 0 0 0 4px var(--focus);
+}
+
+/* 👇 Se usa cuando la duración no pasa el regex */
+.input-error{
+  border-color: var(--accent) !important;
+  box-shadow: 0 0 0 4px var(--focus) !important;
+}
+
+/* Quitar flechas del input number (Chrome/Edge) */
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+
+/* Estándar (sirve en Firefox moderno y otros) */
+input[type="number"] { appearance: textfield; }
+
+/* Que el date tome el padding igual que el resto */
+input[type="date"] { line-height: 1.2; }
+
+button{
+  background:linear-gradient(180deg, #de6a89 0%, var(--accent) 100%);
+  color:#fff;
+  padding: .95rem 1.1rem;
+  border:none;
+  border-radius:12px;
+  font-size:1rem;
+  cursor:pointer;
+  box-shadow: 0 6px 14px rgba(212,93,121,.25);
+  transition: transform .05s ease, filter .2s ease;
+}
+button:hover{ filter:brightness(1.02); }
+button:active{ transform: translateY(1px); }
+button:disabled{ opacity:.65; cursor:not-allowed; }
+
+/* Botón secundario opcional */
+.btn-secondary{
+  background:#fff; color:var(--accent);
+  border:1px solid var(--accent);
+  box-shadow:none;
+}
+.btn-secondary:hover{ background:#fff6f8; }
+
+/* =========================
+   Mensajes/meta
+   ========================= */
+.meta{
+  font-size: .9rem;
+  opacity: .7;
+  margin: .25rem 0;
+}
+
+.empty-msg{
+  opacity: .7;
+  display: none;
+}
+
+/* =========================
+   Lista de registros
+   ========================= */
+ul{ list-style:none; padding-left:0; }
+
+li{
+  background: var(--card);
+  border:1px solid var(--line);
+  padding:1rem 1rem 1rem 1rem;
+  margin-bottom:1rem;
+  border-radius:14px;
+  box-shadow: var(--shadow-soft);
+}
+
+.item-header{
+  display:flex; align-items:center; justify-content:space-between;
+  gap:.75rem;
+  margin-bottom:.5rem;
+  flex-wrap: wrap;
+}
+.item-title{ font-weight:700; color:var(--accent-2); }
+
+.chip{
+  padding:.25rem .55rem;
+  border-radius:999px;
+  font-size:.82rem;
+  background:#f4d9e0;
+  color:#5c2b3d;
+  border:1px solid #efcbd3;
+  white-space: nowrap;        /* evita saltos raros en móvil */
+  text-transform: capitalize; /* “alta” => “Alta” */
+}
+
+/* Colores por tipo/intensidad/emoción/fase */
+/* Intensidad */
+.chip--alta   { background:#ffdfe7; border-color:#ffc7d6; }
+.chip--media  { background:#fff3c8; border-color:#ffe79c; }
+.chip--baja   { background:#e0f7ea; border-color:#bfeeda; }
+
+/* Emoción / ánimo */
+.chip--feliz       { background:#ffeab0; border-color:#ffd97a; }
+.chip--cansada     { background:#f6e2ff; border-color:#e4c9ff; }
+.chip--tranquila   { background:#dff5ff; border-color:#c5eefe; }
+.chip--ansiosa     { background:#ffe1e1; border-color:#ffc7c7; }
+.chip--frustrada   { background:#ffe6d2; border-color:#ffd3b3; }
+.chip--conenergia  { background:#e9ffe6; border-color:#d3ffd0; } /* “Con energía” normaliza a conenergia */
+
+/* Tipo */
+.chip--running   { background:#ffe6d2; border-color:#ffd3b3; }
+.chip--bicicleta { background:#e6e9ff; border-color:#d2d7ff; }
+.chip--caminata  { background:#e9ffe6; border-color:#d3ffd0; }
+
+/* Fase (alias para evitar problemas de tildes) */
+.chip--folicular      { background:#e6f7ff; border-color:#cbeeff; }
+.chip--ovulatoria,
+.chip--ovulacion      { background:#fff1cc; border-color:#ffe19e; }
+.chip--lutea,
+.chip--lutéa          { background:#ffe6f1; border-color:#ffcade; }
+.chip--menstrual,
+.chip--menstruacion,
+.chip--menstruación   { background:#ffe1e1; border-color:#ffc7c7; }
+
+.chip--alimentacion { background:#ffeccc; border-color:#ffd9a3; }
+
+.kv{
+  display:grid;
+  grid-template-columns: 1fr 1fr;
+  gap:.35rem 1rem;
+  margin-top:.5rem;
+}
+.kv span{ color:var(--muted); font-size:.92rem; }
+
+/* =========================
+   Vista previa / tarjetas (mock)
+   ========================= */
+.preview { margin-top: 2rem; }
+
+.error{
+  background:#fff3cd; border:1px solid #ffeeba;
+  padding:0.75rem; border-radius:6px; color:#856404;
+}
+.hidden { display: none; }
+
+.stats-grid{
+  display:grid; grid-template-columns: repeat(4, minmax(0,1fr));
+  gap:0.75rem; margin-bottom:0.75rem;
+}
+.stat{
+  background:#ffe5ec; padding:0.75rem; border-radius:10px;
+  border-left:5px solid #d45d79; display:flex; flex-direction:column; gap:0.25rem;
+}
+.stat .label{ font-size:0.85rem; color:#5c2b3d; }
+.stat .value{ font-size:1.25rem; font-weight:700; }
+
+.cards{ display:grid; grid-template-columns: 1fr; gap:1rem; }
+@media (min-width: 720px){ .cards{ grid-template-columns: 1fr 1fr; } }
+
+.card{
+  background:#fff;
+  border:1px solid #f0dfe3;
+  border-radius:12px;
+  box-shadow:0 0 6px rgba(180,120,100,0.12);
+  overflow:hidden;
+}
+.card-header{
+  display:flex; align-items:center; justify-content:space-between;
+  padding:0.75rem 1rem; background:#fff8f4; border-bottom:1px solid #f0dfe3;
+}
+.card-header h3{ margin:0; color:#a9445f; }
+.badge{ background:#d45d79; color:#fff; padding:0.25rem 0.5rem; border-radius:999px; font-size:0.85rem; }
+.card-body{ padding:0.75rem 1rem; }
+.subcard{ background:#fff8f4; border:1px dashed #f0dfe3; border-radius:8px; padding:0.5rem; margin-top:0.5rem; }
+.muted{ color:#6b5c64; font-size:0.9rem; }
+
+/* Botones/acciones secundarios */
+.card-row{ margin: .2rem 0; }
+.card-actions{ margin-top:.6rem; display:flex; gap:.5rem; flex-wrap: wrap; }
+.btn-delete{
+  background:#b94c67; color:#fff; border:none;
+  padding:.45rem .7rem; border-radius:6px; cursor:pointer;
+  transition: filter .2s ease, transform .05s ease;
+}
+.btn-delete:hover{ filter:brightness(0.95); }
+.btn-delete:active{ transform: translateY(1px); }
+
+/* Botón editar */
+.btn-edit{
+  background:#fff; color:#a9445f; border:1px solid #a9445f;
+  padding:.45rem .7rem; border-radius:6px; cursor:pointer;
+  transition: filter .2s ease, transform .05s ease, background .2s ease;
+}
+.btn-edit:hover{ background:#fff6f8; }
+.btn-edit:active{ transform: translateY(1px); }
+
+/* Resumen arriba de la lista */
+.resumen{
+  background:#fff0f4; padding:.8rem; margin-bottom:1rem;
+  border:1px dashed #d45d79; border-radius:6px;
+}
+
+/* =========================
+   Responsive
+   ========================= */
+@media (max-width: 600px){
+  body{ margin:1rem auto; padding:1rem; }
+  h1{ font-size:1.6rem; margin-bottom:1.4rem; }
+  .banner{ border-radius:12px; }
+  input,select,textarea{ padding:.75rem .85rem; font-size:.97rem; border-radius:10px; }
+  button{ padding:.85rem 1rem; border-radius:10px; }
+  .kv{ grid-template-columns: 1fr; }
+}
+
+/* =========================
+   Dark mode (auto)
+   ========================= */
+   @media (prefers-color-scheme: dark){
+    :root{
+      --bg: #121216;
+      --card: #1a1b20;
+      --text: #ececf0;
+      --muted:#b7b3b8;
+      --line:#2a2b32;
+      --peach:#29222a;
+      --focus: rgba(212,93,121,.25);
+      --shadow: 0 10px 24px rgba(0,0,0,.45);
+      --shadow-soft: 0 6px 16px rgba(0,0,0,.35);
+      /* mantenemos --accent / --accent-2 para identidad */
+    }
+  
+    body{
+      background: radial-gradient(1200px 600px at 50% -100px,#1d1620 0%, var(--bg) 55%);
+      color: var(--text);
+      box-shadow: var(--shadow);
+    }
+  
+    .banner{ box-shadow: var(--shadow-soft); }
+  
+    input, select, textarea{
+      background:#14151a;
+      color:var(--text);
+      border-color: var(--line);
+    }
+    input::placeholder, textarea::placeholder{ color:#8e8991; }
+    input:focus, select:focus, textarea:focus{
+      border-color: var(--accent);
+      box-shadow: 0 0 0 4px var(--focus);
+    }
+  
+    button{
+      box-shadow: 0 6px 14px rgba(212,93,121,.35);
+    }
+    .btn-secondary{
+      background: transparent;
+      color: var(--accent);
+      border-color: var(--accent);
+    }
+    .btn-secondary:hover{ background: rgba(212,93,121,.08); }
+  
+    li{
+      background: var(--card);
+      border-color: var(--line);
+      box-shadow: var(--shadow-soft);
+    }
+  
+    .item-title{ color: var(--text); }
+    .kv span{ color: var(--muted); }
+  
+    /* Chips en dark: tonos más sobrios sin perder semántica */
+    .chip{
+      color:#f3eef1;
+      border-color: rgba(255,255,255,.12);
+      background: #2a2630;
+    }
+    .chip--alta        { background:#3b2430; border-color:#6e3a53; }
+    .chip--media       { background:#3a3424; border-color:#6d5f32; }
+    .chip--baja        { background:#1e3328; border-color:#2a7a54; }
+  
+    .chip--feliz       { background:#3b3621; border-color:#8a6f2a; }
+    .chip--cansada     { background:#30263a; border-color:#634e87; }
+    .chip--tranquila   { background:#1f2f39; border-color:#3a6b88; }
+    .chip--ansiosa     { background:#3a2626; border-color:#7a4a4a; }
+    .chip--frustrada   { background:#3a2f21; border-color:#7a5a32; }
+    .chip--conenergia  { background:#223620; border-color:#4a8c45; }
+  
+    .chip--running     { background:#3a2a22; border-color:#7a5640; }
+    .chip--bicicleta   { background:#26293a; border-color:#4a4f8c; }
+    .chip--caminata    { background:#203224; border-color:#3f7a47; }
+  
+    .chip--folicular   { background:#1e2e38; border-color:#34586b; }
+    .chip--ovulatoria,
+    .chip--ovulacion   { background:#3a321f; border-color:#7a6a33; }
+    .chip--lutea,
+    .chip--lutéa       { background:#362233; border-color:#6c3f62; }
+    .chip--menstrual,
+    .chip--menstruacion,
+    .chip--menstruación{ background:#3a2528; border-color:#7a4a52; }
+  
+    .chip--alimentacion{ background:#3a3222; border-color:#7a5e2f; }
+  
+    .error{
+      background:#2b241a;
+      border-color:#5a4a2a;
+      color:#ebd7a2;
+    }
+  
+    .resumen{
+      background:#241821;
+      border-color:#8b3655;
+    }
+  
+    .card{
+      background:#17171b;
+      border-color:#2a2b32;
+      box-shadow: var(--shadow-soft);
+    }
+    .card-header{
+      background:#1f1f24;
+      border-color:#2a2b32;
+    }
+    .badge{ background:#c45775; }
+  
+    /* Acciones */
+    .btn-delete{
+      background:#8e3952;
+    }
+    .btn-delete:hover{ filter:brightness(1.05); }
+  
+    .btn-edit{
+      background: transparent;
+      color:#e7c3cc;
+      border-color:#a35b73;
+    }
+    .btn-edit:hover{ background: rgba(163,91,115,.12); }
+  }
+
+  /* Vista previa de pace bajo la duración */
+.pace-preview { font-size:.9rem; opacity:.85; margin-top:-.35rem; }
+.pace-preview.warn { color:#e53935; }
