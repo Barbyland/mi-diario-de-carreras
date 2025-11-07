@@ -73,8 +73,9 @@
         └── 003_queries.sql   # consultas útiles
 
 ---
-
+```
 🔄 Flujo de la UI
+```mermaid
 flowchart TD
   U[Usuario] --> F[ui/form.js]
   F --> I[ui/index.js]
@@ -84,7 +85,7 @@ flowchart TD
   A --> R[ui/render.js]
   LS --> R
   R --> UI[Pantalla]
-
+```
 ____________________________________________________________________________________
 ▶️ Cómo ejecutar (solo front)
 
@@ -165,8 +166,6 @@ ________________________________________________________________________________
 
 ---
 
-
----
 
 <p align="center">
   Desarrollado con 💻 y pasión por <b>Barby Bernhard</b><br>
