@@ -1,6 +1,21 @@
-🏃‍♀️ Mi Diario de Carreras
+<h1 align="center">🏃‍♀️ Mi Diario de Carreras</h1>
 
-Aplicación web para registrar entrenamientos (running, bici, caminata, etc.), visualizar métricas básicas y guardar la información de forma local o en una API real con Express + MySQL.
+<p align="center">
+  <em>Proyecto Final - Tecnicatura en Programación (TECLAB)</em><br>
+  Aplicación web para registrar entrenamientos, emociones, alimentación y fases del ciclo menstrual,<br>
+  con almacenamiento local o conexión a una API en MySQL.
+</p>
+
+<p align="center">
+  🔗 <b>Versión online:</b><br>
+  <a href="https://barbyland.github.io/mi-diario-de-carreras/" target="_blank">
+    https://barbyland.github.io/mi-diario-de-carreras/
+  </a>
+</p>
+
+<p align="center">
+  <img src="img/preview-mi-diario.PNG" alt="Preview del proyecto Mi Diario de Carreras" width="600"/>
+</p>
 ___________________________________________________________________________________________________________
 
 ✨ Funcionalidades
