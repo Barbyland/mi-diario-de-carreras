@@ -172,6 +172,6 @@ ________________________________________________________________________________
   <em>Lic. en Turismo | Técnica Superior en Programación (TECLAB) | Runner & Cyclist 🏃‍♀️🚴‍♀️</em><br><br>
   <em>Proyecto Final aprobado en la Práctica Profesionalizante del Instituto Técnico Superior Teclab.</em><br><br>
   🌐 <a href="https://github.com/Barbyland" target="_blank">GitHub</a> |
-  💼 <a href="https://www.linkedin.com/in/barbarabernhard/" target="_blank">LinkedIn</a>
+  💼 <a href="https://www.linkedin.com/in/barbara-bernhard/" target="_blank">LinkedIn</a>
 </p>
 
