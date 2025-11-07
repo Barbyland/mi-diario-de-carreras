@@ -16,74 +16,63 @@
 <p align="center">
   <img src="img/preview-mi-diario.PNG" alt="Preview del proyecto Mi Diario de Carreras" width="600"/>
 </p>
-___________________________________________________________________________________________________________
+---
 
-✨ Funcionalidades
-Registro de entrenamientos
+## ✨ Funcionalidades
 
-📅 fecha (YYYY-MM-DD)
+**Registro de entrenamientos**
+- 📅 fecha (YYYY-MM-DD)
+- 🏃 tipo (Running, Bicicleta, Caminata, Otra)
+- 📏 distancia (km)
+- ⏱️ duración (HH:MM:SS o MM:SS)
+- 🔥 intensidad (Baja, Media, Alta)
+- 🙂 sentimiento (Feliz, Cansada, etc.)
+- ♀️ ciclo_menstrual (Folicular, Ovulatoria, Lútea, Menstrual) – opcional
+- 🍌 alimentacion_previa (texto) – opcional
+- 📝 comentarios
 
-🏃 tipo (Running, Bicicleta, Caminata, Otra)
+**Lista de registros con**
+- ✅ chips de colores por intensidad, sentimiento y ciclo
+- 🧮 cálculo automático del pace (min/km)
+- 📊 resumen de total de km y cantidad de entradas
+- ✏️ edición con modo inline
+- 🗑️ eliminación
 
-📏 distancia (km)
+**Persistencia**
+- 💾 localStorage (modo demo, sin servidor)
+- 🌐 API real (Express + MySQL) si está disponible
 
-⏱️ duración (HH:MM:SS o MM:SS)
+---
 
-🔥 intensidad (Baja, Media, Alta)
+## 🧱 Estructura del proyecto
 
-🙂 sentimiento (Feliz, Cansada, etc.)
-
-♀️ ciclo_menstrual (Folicular, Ovulatoria, Lútea, Menstrual) – opcional
-
-🍌 alimentacion_previa (texto) – opcional
-
-📝 comentarios
-
-Lista de registros con
-
-✅ chips de colores por intensidad, sentimiento y ciclo
-
-🧮 cálculo automático del pace (min/km)
-
-📊 resumen de total de km y cantidad de entradas
-
-✏️ edición con modo inline
-
-🗑️ eliminación
-
-Persistencia
-
-💾 localStorage (modo demo, sin servidor)
-
-🌐 API real (Express + MySQL) si está disponible
-_________________________________________________________________________________
-
-🧱 Estructura del proyecto
+```plaintext
 .
-├─ index.html
-├─ style.css
-├─ README.md
+├── index.html
+├── style.css
+├── README.md
 │
-├─ helpers/
-│  └─ utils.js           # helpers reutilizables (fecha, pace, etc.)
+├── helpers/
+│   └── utils.js              # helpers reutilizables (fecha, pace, etc.)
 │
-├─ data/
-│  └─ api.js             # capa HTTP cruda: fetch a API Express
+├── data/
+│   └── api.js                # capa HTTP cruda: fetch a API Express
 │
-├─ ui/
-│  ├─ data-layer.js      # decide origen: API real o LocalStorage fallback
-│  ├─ form.js            # lógica del formulario: leer/validar/llenar/editar
-│  ├─ render.js          # render del listado + resumen + chips
-│  └─ index.js           # “pegamento”: conecta UI, data y render
+├── ui/
+│   ├── data-layer.js         # decide origen: API real o LocalStorage fallback
+│   ├── form.js               # lógica del formulario: leer/validar/llenar/editar
+│   ├── render.js             # render del listado + resumen + chips
+│   └── index.js              # “pegamento”: conecta UI, data y render
 │
-└─ server/               # backend Node + Express (opcional)
-   ├─ server.js
-   ├─ db-mysql.js
-   └─ sql/
-      ├─ 001_schema.sql  # CREATE DATABASE/TABLE
-      ├─ 002_seed.sql    # datos iniciales
-      └─ 003_queries.sql # consultas útiles
-__________________________________________________________________________________
+└── server/                   # backend Node + Express (opcional)
+    ├── server.js
+    ├── db-mysql.js
+    └── sql/
+        ├── 001_schema.sql    # CREATE DATABASE/TABLE
+        ├── 002_seed.sql      # datos iniciales
+        └── 003_queries.sql   # consultas útiles
+
+
 🔄 Flujo de la UI
 flowchart TD
   U[Usuario] --> F[ui/form.js]
@@ -94,40 +83,40 @@ flowchart TD
   A --> R[ui/render.js]
   LS --> R
   R --> UI[Pantalla]
+
 ____________________________________________________________________________________
 ▶️ Cómo ejecutar (solo front)
 
-Abrir el proyecto en VS Code.
+1. Abrir el proyecto en VS Code.
 
-Usar Live Server o abrir index.html en el navegador.
+2. Usar Live Server o abrir index.html directamente en el navegador.
 
-Registrar entrenamientos desde el formulario.
+3. Registrar entrenamientos desde el formulario.
 
-Los datos se guardan en localStorage.
+4. Los datos se guardan automáticamente en localStorage.
 
 ____________________________________________________________________________________
 
 🗄️ Usar con API real (Express + MySQL)
 
-Tener MySQL corriendo y crear BD/tablas con:
+1. Tener MySQL corriendo y crear BD/tablas con:
 
 server/sql/001_schema.sql
 
 server/sql/002_seed.sql
 
-Configurar credenciales en db-mysql.js:
+2. Configurar credenciales en db-mysql.js:
 
 MYSQL_HOST, MYSQL_PORT, MYSQL_USER, MYSQL_PASS, MYSQL_DB
 
 
-Instalar dependencias y levantar servidor:
+3. Instalar dependencias y levantar servidor:
 
 cd server
 npm install
 node server.js
 
-
-La API se expone en:
+4. Endpoints disponibles:
 
 GET /api/entrenamientos
 
@@ -172,3 +161,8 @@ ________________________________________________________________________________
 🔜 Exportar a CSV
 
 🔜 Gráficos de evolución
+
+<p align="center">
+  Desarrollado con 💻 y pasión por <b>Barby Bernhard</b> <br>
+  <em>Lic. en Turismo | Estudiante de Programación | Runners & Cyclist 🏃‍♀️🚴‍♀️</em>
+</p>
