@@ -72,6 +72,7 @@
         ├── 002_seed.sql      # datos iniciales
         └── 003_queries.sql   # consultas útiles
 
+---
 
 🔄 Flujo de la UI
 flowchart TD
@@ -165,6 +166,8 @@ ________________________________________________________________________________
 ---
 
 
+---
+
 <p align="center">
   Desarrollado con 💻 y pasión por <b>Barby Bernhard</b><br>
   <em>Lic. en Turismo | Técnica Superior en Programación (TECLAB) | Runner & Cyclist 🏃‍♀️🚴‍♀️</em><br><br>
@@ -172,3 +175,4 @@ ________________________________________________________________________________
   🌐 <a href="https://github.com/Barbyland" target="_blank">GitHub</a> |
   💼 <a href="https://www.linkedin.com/in/barbarabernhard/" target="_blank">LinkedIn</a>
 </p>
+
