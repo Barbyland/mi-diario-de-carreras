@@ -16,7 +16,7 @@
 <p align="center">
   <img src="img/preview-mi-diario.PNG" alt="Preview del proyecto Mi Diario de Carreras" width="600"/>
 </p>
----
+
 
 ## ✨ Funcionalidades
 
@@ -162,7 +162,13 @@ ________________________________________________________________________________
 
 🔜 Gráficos de evolución
 
+---
+
+
 <p align="center">
-  Desarrollado con 💻 y pasión por <b>Barby Bernhard</b> <br>
-  <em>Lic. en Turismo | Estudiante de Programación | Runners & Cyclist 🏃‍♀️🚴‍♀️</em>
+  Desarrollado con 💻 y pasión por <b>Barby Bernhard</b><br>
+  <em>Lic. en Turismo | Técnica Superior en Programación (TECLAB) | Runner & Cyclist 🏃‍♀️🚴‍♀️</em><br><br>
+  <em>Proyecto Final aprobado en la Práctica Profesionalizante del Instituto Técnico Superior Teclab.</em><br><br>
+  🌐 <a href="https://github.com/Barbyland" target="_blank">GitHub</a> |
+  💼 <a href="https://www.linkedin.com/in/barbarabernhard/" target="_blank">LinkedIn</a>
 </p>
