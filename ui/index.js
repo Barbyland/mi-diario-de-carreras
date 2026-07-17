@@ -1,12 +1,11 @@
 import {
-  obtenerOrigenDatos,
   cargarEntradas,
   guardarEntrada,
   actualizarEntrada,
   eliminarEntrada
 } from './data-layer.js';
 import { initForm, UIForm } from './form.js';
-import { renderEntradas, setOrigen } from './render.js';
+import { renderEntradas } from './render.js';
 
 function setAppStatus(message, kind = 'info') {
   const status = document.getElementById('appStatus');
@@ -21,8 +20,6 @@ async function refresh(callbacks) {
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
-  setOrigen(await obtenerOrigenDatos());
-
   const callbacks = {
     onEdit(entry) {
       UIForm.enterEditMode(entry);

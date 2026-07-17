@@ -28,11 +28,6 @@ function createDataItem(label, value) {
   return item;
 }
 
-export function setOrigen(origin) {
-  const element = document.getElementById('origenDatos');
-  if (element) element.textContent = `Origen de datos: ${origin}`;
-}
-
 export function renderResumen(entries) {
   const totalKm = entries.reduce((total, entry) => {
     const distance = Number(entry.distancia ?? entry.distancia_km ?? 0);

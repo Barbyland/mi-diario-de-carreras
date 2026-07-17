@@ -71,10 +71,6 @@ function toApi(entry) {
   };
 }
 
-export async function obtenerOrigenDatos() {
-  return (await shouldUseApi()) ? 'API + MySQL' : 'LocalStorage (demo)';
-}
-
 export async function cargarEntradas() {
   if (await shouldUseApi()) {
     try {
