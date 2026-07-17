@@ -1,223 +1,167 @@
-// ui/form.js
-// Lógica del formulario: alta/edición con validación, normalización y pace en vivo
+import { byId, toHHMMSS, parseDurationToMinutes, minutesToPace } from '../helpers/utils.js';
 
-import {
-  byId,
-  toHHMMSS,
-  parseDurationToMinutes,
-  minutesToPace
-} from '../helpers/utils.js';
+const DURATION_PATTERN = /^(?:\d{2}:[0-5]\d:[0-5]\d|\d{1,3}:[0-5]\d)$/;
+const MAX_DURATION_MINUTES = 24 * 60;
 
-const DURACION_RGX = /^(\d{2}:\d{2}:\d{2}|\d{1,2}:\d{2})$/;
+const form = byId('registroForm');
+const submitButton = form?.querySelector('button[type="submit"]');
+const cancelButton = byId('btnCancelEdit');
+const durationInput = byId('duracion');
+const durationError = byId('duracionError');
+const distanceInput = byId('distancia');
+const paceLive = byId('paceLive');
+const formStatus = byId('formStatus');
+const dateInput = byId('fecha');
 
-const form            = byId('registroForm');
-const submitBtn       = form?.querySelector('button[type="submit"]');
-const cancelBtn       = byId('btnCancelEdit');
-const duracionInput   = byId('duracion');
-const duracionError   = byId('duracionError');
-const distanciaInput  = byId('distancia');
-const paceLive        = byId('paceLive');     // <p id="paceLive" ...>
-const duracionHint    = byId('duracionHint'); // <p id="duracionHint" ...>
+let currentEditId = null;
 
-let currentEditId = null; // estado interno de edición
+function getValue(id, fallback = '') {
+  const element = byId(id);
+  return element ? String(element.value || '').trim() : fallback;
+}
 
-// ------------------------------
-// Helpers robustos para leer/escribir
-const getVal = (ids, def = '') => {
-  for (const i of ids) {
-    const el = byId(i);
-    if (el && typeof el.value !== 'undefined') return (el.value || '').trim();
-  }
-  return def;
-};
-const setVal = (id, v) => {
-  const el = byId(id);
-  if (el) el.value = (v ?? '');
-};
+function setValue(id, value) {
+  const element = byId(id);
+  if (element) element.value = value ?? '';
+}
 
-// ------------------------------
-// Pace en vivo debajo del formulario
+function setStatus(message, kind = 'info') {
+  if (!formStatus) return;
+  formStatus.textContent = message;
+  formStatus.dataset.kind = kind;
+}
+
 function updateLivePace() {
-  if (!duracionInput || !distanciaInput || !paceLive) return;
+  if (!durationInput || !distanceInput || !paceLive) return;
+  const duration = durationInput.value.trim();
+  const distance = Number(distanceInput.value);
+  const minutes = parseDurationToMinutes(toHHMMSS(duration) || '');
 
-  const raw  = (duracionInput.value || '').trim();
-  const dist = Number(distanciaInput.value || 0);
-
-  // Ocultar si falta info o el regex no da
-  if (!raw || !DURACION_RGX.test(raw) || !dist) {
-    paceLive.classList.add('hidden');
+  if (!DURATION_PATTERN.test(duration) || minutes <= 0 || distance <= 0) {
+    paceLive.hidden = true;
     paceLive.textContent = '';
     return;
   }
 
-  // Heurística: si parece HH grande, avisamos
-  const parts = raw.split(':').map(n => parseInt(n, 10));
-  const suspicious = (parts.length === 3 && parts[0] >= 6);
-
-  const mins = parseDurationToMinutes(raw);    // acepta MM:SS o HH:MM:SS
-  const pace = minutesToPace(mins, dist);      // mm:ss
-
-  paceLive.textContent = suspicious
-    ? `Revisá duración (parecen ${parts[0]} horas). Pace estimado: ${pace} min/km`
-    : `Pace: ${pace} min/km`;
-
-  paceLive.classList.remove('hidden');
+  paceLive.textContent = `Pace estimado: ${minutesToPace(minutes, distance)} min/km`;
+  paceLive.hidden = false;
 }
 
-// ------------------------------
-// Lee el form y devuelve payload CONSISTENTE CON LA UI
-// (La conversión a contrato de API la hace data-layer.toAPI)
-function entradaFromForm() {
-  const ciclo = getVal(['ciclo_menstrual', 'ciclo', 'fase_ciclo'], '');
-  const alim  = getVal(['alimentacion_previa', 'alimentacion', 'alimentacion_pre'], '');
+export function validateDuration() {
+  if (!durationInput) return true;
+  const raw = durationInput.value.trim();
+  const normalized = toHHMMSS(raw);
+  const minutes = parseDurationToMinutes(normalized || '');
+  const valid = DURATION_PATTERN.test(raw) && minutes > 0 && minutes <= MAX_DURATION_MINUTES;
 
-  // Normalizo duración a HH:MM:SS manteniendo el patrón validado
-  const dur = toHHMMSS(getVal(['duracion'])) || '';
+  durationInput.setAttribute('aria-invalid', String(!valid));
+  durationInput.classList.toggle('input-error', !valid);
+  if (durationError) {
+    durationError.hidden = valid;
+    durationError.textContent = 'Usá HH:MM:SS o MM:SS, con segundos válidos y una duración máxima de 24 horas.';
+  }
 
+  if (valid) updateLivePace();
+  else if (paceLive) {
+    paceLive.hidden = true;
+    paceLive.textContent = '';
+  }
+  return valid;
+}
+
+export function entryFromForm() {
   return {
-    fecha:               getVal(['fecha']),
-    tipo:                getVal(['tipo'], 'Running'),
-    distancia:           Number(getVal(['distancia'])) || 0,
-    duracion:            dur,
-    intensidad:          getVal(['intensidad'], 'Baja'),
-    emociones:           getVal(['emociones'], 'Feliz'),
-    ciclo_menstrual:     ciclo || '',
-    alimentacion_previa: alim  || '',
-    comentarios:         getVal(['comentarios']) || ''
+    fecha: getValue('fecha'),
+    tipo: getValue('tipo', 'Running'),
+    distancia: Number(getValue('distancia')),
+    duracion: toHHMMSS(getValue('duracion')) || '',
+    intensidad: getValue('intensidad', 'Baja'),
+    emociones: getValue('emociones', 'Feliz'),
+    ciclo_menstrual: getValue('ciclo_menstrual'),
+    alimentacion_previa: getValue('alimentacion_previa'),
+    comentarios: getValue('comentarios')
   };
 }
 
-// ------------------------------
-// Completa el form con una entrada (para Editar) — formato UI
-export function fillFormUI(e) {
-  setVal('fecha', e.fecha || '');
-  setVal('tipo', e.tipo ?? 'Running');
-  setVal('distancia', Number(e.distancia ?? 0) || '');
-  setVal('duracion', e.duracion ?? '');
-  setVal('intensidad', e.intensidad ?? 'Baja');
-  setVal('emociones', e.emociones ?? 'Feliz');
-
-  const ciclo = e.ciclo_menstrual ?? '';
-  ['ciclo_menstrual','ciclo','fase_ciclo'].some(id => {
-    const el = byId(id);
-    if (el) { el.value = ciclo; return true; }
-    return false;
-  });
-
-  const alim = e.alimentacion_previa ?? '';
-  ['alimentacion_previa','alimentacion','alimentacion_pre'].some(id => {
-    const el = byId(id);
-    if (el) { el.value = alim; return true; }
-    return false;
-  });
-
-  setVal('comentarios', e.comentarios ?? '');
-
-  // refresco preview por si ya hay datos
+export function fillForm(entry) {
+  setValue('fecha', entry.fecha);
+  setValue('tipo', entry.tipo || 'Running');
+  setValue('distancia', entry.distancia ?? entry.distancia_km ?? '');
+  setValue('duracion', entry.duracion);
+  setValue('intensidad', entry.intensidad || 'Baja');
+  setValue('emociones', entry.emociones ?? entry.sentimiento ?? 'Feliz');
+  setValue('ciclo_menstrual', entry.ciclo_menstrual);
+  setValue('alimentacion_previa', entry.alimentacion_previa);
+  setValue('comentarios', entry.comentarios ?? entry.descripcion ?? '');
   updateLivePace();
 }
 
-function enterEditMode(e) {
-  currentEditId = e.id ?? null;
-  fillFormUI(e);
-  if (submitBtn) submitBtn.textContent = 'Guardar cambios';
-  cancelBtn?.classList.remove('hidden');
+function enterEditMode(entry) {
+  currentEditId = entry.id ?? null;
+  fillForm(entry);
+  if (submitButton) submitButton.textContent = 'Guardar cambios';
+  if (cancelButton) cancelButton.hidden = false;
+  setStatus('Editando registro.');
   form?.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
 function resetEditState() {
   currentEditId = null;
-  if (submitBtn) submitBtn.textContent = 'Guardar entrada';
-  cancelBtn?.classList.add('hidden');
   form?.reset();
-  duracionError?.classList.add('hidden');
-  duracionInput?.classList.remove('input-error');
-  // oculto preview
+  if (submitButton) submitButton.textContent = 'Guardar entrada';
+  if (cancelButton) cancelButton.hidden = true;
+  if (durationError) durationError.hidden = true;
+  durationInput?.classList.remove('input-error');
+  durationInput?.setAttribute('aria-invalid', 'false');
   if (paceLive) {
-    paceLive.classList.add('hidden');
+    paceLive.hidden = true;
     paceLive.textContent = '';
   }
 }
 
-// ------------------------------
-// Validación de duración (con sugerencia)
-function validateDuracion() {
-  if (!duracionInput) return true;
-  const raw = (duracionInput.value || '').trim();
-  const okRegex = DURACION_RGX.test(raw);
-
-  let ok = okRegex;
-  if (okRegex) {
-    const parts = raw.split(':').map(n => parseInt(n, 10));
-    if (parts.length === 3) {
-      const [h, m, s] = parts;
-      if (h >= 6 && m < 60 && s < 60) ok = false; // probablemente era MM:SS
-    }
-  }
-
-  duracionError.textContent = ok
-    ? 'Formato de duración inválido.'
-    : 'Revisá la duración: usá HH:MM:SS (00:29:05) o MM:SS (29:05).';
-  duracionError?.classList.toggle('hidden', ok);
-  duracionInput?.classList.toggle('input-error', !ok);
-
-  // Actualiza/oculta el preview
-  if (ok) updateLivePace();
-  else if (paceLive) {
-    paceLive.classList.add('hidden');
-    paceLive.textContent = '';
-  }
-
-  return ok;
+function setupValidation() {
+  if (dateInput) dateInput.max = new Date().toISOString().slice(0, 10);
+  durationInput?.addEventListener('input', validateDuration);
+  durationInput?.addEventListener('blur', validateDuration);
+  distanceInput?.addEventListener('input', updateLivePace);
 }
 
-// ------------------------------
-// Enlaza validaciones + preview en vivo
-function setupFormValidation() {
-  if (!duracionInput) return;
-  duracionInput.addEventListener('input', () => { validateDuracion(); });
-  duracionInput.addEventListener('blur',  () => { validateDuracion(); });
-
-  distanciaInput?.addEventListener('input', () => { if (validateDuracion()) updateLivePace(); });
-
-  // hint inicial opcional
-  if (duracionHint) duracionHint.textContent = 'Ej: 00:29:05 o 29:05';
-}
-
-// ------------------------------
-// Inicializa eventos y delega save/cancel al que llama (index.js)
 export function initForm({ onSave, onCancel } = {}) {
-  if (!form) {
-    console.error('No se encontró #registroForm en el DOM.');
-    return;
-  }
+  if (!form) return;
+  setupValidation();
 
-  setupFormValidation();
+  form.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    if (!validateDuration()) {
+      durationInput?.focus();
+      return;
+    }
 
-  form.addEventListener('submit', async (ev) => {
-    ev.preventDefault();
-    if (!validateDuracion()) return;
-
-    const payload = entradaFromForm();
-    await onSave?.(payload, currentEditId);
-    resetEditState();
+    const editingId = currentEditId;
+    if (submitButton) submitButton.disabled = true;
+    setStatus(editingId ? 'Guardando cambios…' : 'Guardando entrenamiento…');
+    try {
+      await onSave?.(entryFromForm(), editingId);
+      resetEditState();
+      setStatus(editingId ? 'Cambios guardados.' : 'Entrenamiento registrado.', 'success');
+    } catch (error) {
+      setStatus(`No se pudo guardar: ${error.message}`, 'error');
+    } finally {
+      if (submitButton) submitButton.disabled = false;
+    }
   });
 
-  cancelBtn?.addEventListener('click', (ev) => {
-    ev.preventDefault();
+  cancelButton?.addEventListener('click', () => {
     resetEditState();
+    setStatus('Edición cancelada.');
     onCancel?.();
   });
 }
 
-// Exports para que index.js u otros módulos puedan controlar el form
 export const UIForm = {
-  initForm,
   enterEditMode,
   resetEditState,
-  validateDuracion,
-  setupFormValidation,
-  entradaFromForm,
-  get currentEditId() { return currentEditId; },
-  set currentEditId(v) { currentEditId = v; }
+  validateDuration,
+  entryFromForm,
+  get currentEditId() { return currentEditId; }
 };
