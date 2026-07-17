@@ -1,7 +1,3 @@
-// ui/data-layer.js — capa de datos para la UI
-// Usa API real si está disponible y cae a LocalStorage si no.
-// Además normaliza UI <-> API.
-
 import {
   apiOk,
   listEntrenamientos,
@@ -10,139 +6,129 @@ import {
   deleteEntrenamiento
 } from '../data/api.js';
 
-// =========================
-// LocalStorage helpers
-// =========================
-const LS_KEY = 'mdc:entradas:v1';
+const STORAGE_KEY = 'mdc:entradas:v1';
+let apiAvailable;
 
-// (migración 1 sola vez desde 'entradas' → 'mdc:entradas:v1')
-(function migrateOnce() {
+(function migrateLegacyStorage() {
   try {
-    const oldKey = 'entradas';
-    if (!localStorage.getItem(LS_KEY) && localStorage.getItem(oldKey)) {
-      localStorage.setItem(LS_KEY, localStorage.getItem(oldKey));
-      console.info('Migradas entradas locales →', LS_KEY);
+    if (!localStorage.getItem(STORAGE_KEY) && localStorage.getItem('entradas')) {
+      localStorage.setItem(STORAGE_KEY, localStorage.getItem('entradas'));
     }
-  } catch { /* ignore */ }
-})();
+  } catch {
+    // La aplicación seguirá funcionando sin persistencia si el navegador la bloquea.
+  }
+}());
 
-function lsRead() {
-  try { return JSON.parse(localStorage.getItem(LS_KEY) || '[]'); }
-  catch { return []; }
-}
-function lsWrite(arr) { localStorage.setItem(LS_KEY, JSON.stringify(arr)); }
-
-// =========================
-// Normalización API → UI
-// =========================
-function extraer(descripcion, clave) {
-  if (!descripcion) return '';
-  const hit = descripcion
-    .split('|')
-    .map(s => s.trim())
-    .find(p => p.toLowerCase().startsWith(clave.toLowerCase() + ':'));
-  return hit ? hit.split(':').slice(1).join(':').trim() : '';
+function readLocal() {
+  try {
+    const value = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+    return Array.isArray(value) ? value : [];
+  } catch {
+    return [];
+  }
 }
 
-function fromAPI(row) {
+function writeLocal(entries) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(entries));
+}
+
+async function shouldUseApi() {
+  if (apiAvailable === undefined) apiAvailable = await apiOk();
+  return apiAvailable;
+}
+
+function disableApi(error) {
+  apiAvailable = false;
+  console.warn('La API no está disponible; se usa LocalStorage.', error?.message || error);
+}
+
+function fromApi(row) {
   return {
-    id: row.id ?? row.entrenamiento_id ?? undefined,
+    id: row.id ?? row.entrenamiento_id,
     fecha: row.fecha || '',
     tipo: row.tipo || '',
     distancia: Number(row.distancia_km ?? row.distancia ?? 0) || 0,
     duracion: row.duracion || '',
-    intensidad: extraer(row.descripcion, 'Intensidad') || (row.intensidad ?? '') || '',
+    intensidad: row.intensidad || '',
     emociones: row.sentimiento || '',
-    comentarios: extraer(row.descripcion, 'Notas') || (row.descripcion ?? ''),
+    comentarios: row.descripcion || '',
     ciclo_menstrual: row.ciclo_menstrual || '',
     alimentacion_previa: row.alimentacion_previa || ''
   };
 }
 
-// =========================
-// Normalización UI → API
-// =========================
-function toAPI(ui) {
+function toApi(entry) {
   return {
-    fecha: ui.fecha,
-    tipo: ui.tipo,
-    distancia_km: Number(ui.distancia ?? ui.distancia_km ?? 0) || 0,
-    duracion: ui.duracion || '00:00:00',
-    descripcion: [
-      ui.comentarios?.trim() ? `Notas: ${ui.comentarios.trim()}` : null,
-      ui.intensidad ? `Intensidad: ${ui.intensidad}` : null
-    ].filter(Boolean).join(' | ') || null,
-    clima: null,
-    sentimiento: ui.emociones || null,
-    ciclo_menstrual: ui.ciclo_menstrual || null,
-    alimentacion_previa: ui.alimentacion_previa || null
+    fecha: entry.fecha,
+    tipo: entry.tipo,
+    distancia_km: Number(entry.distancia) || 0,
+    duracion: entry.duracion || '00:00:00',
+    intensidad: entry.intensidad || '',
+    sentimiento: entry.emociones || '',
+    descripcion: entry.comentarios?.trim() || '',
+    ciclo_menstrual: entry.ciclo_menstrual || '',
+    alimentacion_previa: entry.alimentacion_previa || ''
   };
 }
 
-// =========================
-// API pública para la UI
-// =========================
+export async function obtenerOrigenDatos() {
+  return (await shouldUseApi()) ? 'API + MySQL' : 'LocalStorage (demo)';
+}
+
 export async function cargarEntradas() {
-  try {
-    if (await apiOk()) {
-      // listEntrenamientos YA devuelve array (desempacado)
-      const rows = await listEntrenamientos({ limit: 100, offset: 0 });
-      return rows.map(fromAPI);
+  if (await shouldUseApi()) {
+    try {
+      return (await listEntrenamientos({ limit: 100, offset: 0 })).map(fromApi);
+    } catch (error) {
+      disableApi(error);
     }
-  } catch (e) {
-    console.warn('Fallo API, uso LocalStorage:', e.message);
   }
-  return lsRead(); // formato UI directo
+  return readLocal();
 }
 
-export async function guardarEntrada(entradaUI) {
-  const body = toAPI(entradaUI);
-  try {
-    if (await apiOk()) {
-      const created = await createEntrenamiento(body);
-      return fromAPI(created);
+export async function guardarEntrada(entry) {
+  if (await shouldUseApi()) {
+    try {
+      return fromApi(await createEntrenamiento(toApi(entry)));
+    } catch (error) {
+      disableApi(error);
     }
-  } catch (e) {
-    console.warn('POST API falló, guardo en LS:', e.message);
   }
-  const all = lsRead();
-  const id = (crypto?.randomUUID?.() || String(Date.now()));
-  const withId = { id, ...entradaUI };
-  all.push(withId); lsWrite(all);
-  return withId;
+
+  const entries = readLocal();
+  const id = globalThis.crypto?.randomUUID?.() || String(Date.now());
+  const saved = { id, ...entry };
+  writeLocal([...entries, saved]);
+  return saved;
 }
 
-export async function actualizarEntrada(id, entradaUI) {
-  const body = toAPI(entradaUI);
-  try {
-    if (await apiOk()) {
-      const updated = await updateEntrenamiento(id, body);
-      return fromAPI(updated);
+export async function actualizarEntrada(id, entry) {
+  if (await shouldUseApi()) {
+    try {
+      return fromApi(await updateEntrenamiento(id, toApi(entry)));
+    } catch (error) {
+      disableApi(error);
     }
-  } catch (e) {
-    console.warn('PUT API falló, actualizo en LS:', e.message);
   }
-  const all = lsRead();
-  const i = all.findIndex(x => String(x.id) === String(id));
-  if (i >= 0) {
-    all[i] = { ...all[i], ...entradaUI, id: all[i].id };
-    lsWrite(all);
-    return all[i];
-  }
-  return null;
+
+  const entries = readLocal();
+  const index = entries.findIndex((item) => String(item.id) === String(id));
+  if (index < 0) return null;
+  entries[index] = { ...entries[index], ...entry, id: entries[index].id };
+  writeLocal(entries);
+  return entries[index];
 }
 
 export async function eliminarEntrada(id) {
-  try {
-    if (await apiOk()) {
+  if (await shouldUseApi()) {
+    try {
       await deleteEntrenamiento(id);
       return true;
+    } catch (error) {
+      disableApi(error);
     }
-  } catch (e) {
-    console.warn('DELETE API falló, borro en LS:', e.message);
   }
-  const next = lsRead().filter(x => String(x.id) !== String(id));
-  lsWrite(next);
+
+  writeLocal(readLocal().filter((item) => String(item.id) !== String(id)));
   return true;
 }
-

@@ -1,13 +1,15 @@
-# raíz
-.DS_Store
-node_modules
-.env
-
-# server
+# Dependencies
+node_modules/
 server/node_modules/
+
+# Environment and credentials
+.env
 server/.env
 
-# editor
-.vscode/
+# Test and runtime output
+coverage/
+*.log
 
-ui/package-lock.json
+# Operating systems and editors
+.DS_Store
+.vscode/

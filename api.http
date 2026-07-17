@@ -1,30 +1,36 @@
-### Listar todos
-GET http://localhost:3000/api/entrenamientos
+### Healthcheck
+GET http://localhost:3000/api/health
 
-### Crear uno
+### Listar entrenamientos
+GET http://localhost:3000/api/entrenamientos?limit=20&offset=0
+
+### Crear entrenamiento
 POST http://localhost:3000/api/entrenamientos
 Content-Type: application/json
 
 {
-  "fecha":"2025-10-01",
-  "tipo":"Running",
-  "distancia_km":5.0,
-  "duracion":"00:30:15",
-  "descripcion":"Entrenamiento prueba POST",
-  "sentimiento":"Feliz",
-  "intensidad":"Media",
-  "ciclo_menstrual":"Folicular",
-  "alimentacion_previa":"Banana + agua"
+  "fecha": "2026-07-16",
+  "tipo": "Running",
+  "distancia_km": 10,
+  "duracion": "00:55:30",
+  "intensidad": "Media",
+  "sentimiento": "Con energía",
+  "descripcion": "Fondo progresivo",
+  "ciclo_menstrual": "Folicular",
+  "alimentacion_previa": "Banana y agua"
 }
 
-### Actualizar (cambiá el ID)
-PUT http://localhost:3000/api/entrenamientos/14
+### Obtener por ID
+GET http://localhost:3000/api/entrenamientos/1
+
+### Actualizar por ID
+PUT http://localhost:3000/api/entrenamientos/1
 Content-Type: application/json
 
 {
-  "descripcion":"Actualizado desde VSCode REST Client",
-  "intensidad":"Alta"
+  "intensidad": "Alta",
+  "descripcion": "Registro actualizado desde REST Client"
 }
 
-### Eliminar (cambiá el ID)
-DELETE http://localhost:3000/api/entrenamientos/14
+### Eliminar por ID
+DELETE http://localhost:3000/api/entrenamientos/1

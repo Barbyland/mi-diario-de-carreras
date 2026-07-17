@@ -1,177 +1,191 @@
 <h1 align="center">🏃‍♀️ Mi Diario de Carreras</h1>
 
 <p align="center">
-  <em>Proyecto Final - Tecnicatura en Programación (TECLAB)</em><br>
-  Aplicación web para registrar entrenamientos, emociones, alimentación y fases del ciclo menstrual,<br>
-  con almacenamiento local o conexión a una API en MySQL.
+  Aplicación web para registrar entrenamientos y relacionar rendimiento, emociones,
+  alimentación y fases del ciclo menstrual.
 </p>
 
 <p align="center">
-  🔗 <b>Versión online:</b><br>
-  <a href="https://barbyland.github.io/mi-diario-de-carreras/" target="_blank">
-    https://barbyland.github.io/mi-diario-de-carreras/
-  </a>
+  <a href="https://barbyland.github.io/mi-diario-de-carreras/"><strong>Ver demo</strong></a>
+  ·
+  <a href="https://github.com/Barbyland/mi-diario-de-carreras/actions"><strong>GitHub Actions</strong></a>
 </p>
 
 <p align="center">
-  <img src="img/preview-mi-diario.PNG" alt="Preview del proyecto Mi Diario de Carreras" width="600"/>
+  <img src="img/banner.png" alt="Ilustración de Mi Diario de Carreras" width="760">
 </p>
 
+## Descripción
 
-## ✨ Funcionalidades
+Mi Diario de Carreras es el proyecto final de la Práctica Profesionalizante de la
+Tecnicatura Superior en Programación de TECLAB. Permite crear, consultar, editar y
+eliminar entrenamientos, calcular el ritmo por kilómetro y registrar variables que
+pueden influir en el rendimiento.
 
-**Registro de entrenamientos**
-- 📅 fecha (YYYY-MM-DD)
-- 🏃 tipo (Running, Bicicleta, Caminata, Otra)
-- 📏 distancia (km)
-- ⏱️ duración (HH:MM:SS o MM:SS)
-- 🔥 intensidad (Baja, Media, Alta)
-- 🙂 sentimiento (Feliz, Cansada, etc.)
-- ♀️ ciclo_menstrual (Folicular, Ovulatoria, Lútea, Menstrual) – opcional
-- 🍌 alimentacion_previa (texto) – opcional
-- 📝 comentarios
+La aplicación ofrece dos modos de persistencia:
 
-**Lista de registros con**
-- ✅ chips de colores por intensidad, sentimiento y ciclo
-- 🧮 cálculo automático del pace (min/km)
-- 📊 resumen de total de km y cantidad de entradas
-- ✏️ edición con modo inline
-- 🗑️ eliminación
+- **Demo pública:** utiliza `localStorage`; cada visitante conserva sus datos únicamente en su navegador.
+- **Entorno full-stack local:** utiliza una API REST con Node.js, Express y MySQL.
 
-**Persistencia**
-- 💾 localStorage (modo demo, sin servidor)
-- 🌐 API real (Express + MySQL) si está disponible
+> La demo de GitHub Pages no envía información a un servidor ni comparte registros entre dispositivos.
 
----
+## Funcionalidades
 
-## 🧱 Estructura del proyecto
+- Registro de fecha, actividad, distancia, duración e intensidad.
+- Cálculo automático del pace en `min/km`.
+- Estado emocional, alimentación previa y fase del ciclo menstrual.
+- Edición y eliminación con confirmación explícita.
+- Resumen de kilómetros y cantidad de sesiones.
+- Persistencia automática en `localStorage` o MySQL.
+- Diseño responsive, modo oscuro y navegación mediante teclado.
+- Validación de datos tanto en frontend como en backend.
 
-```plaintext
-.
-├── index.html
-├── style.css
-├── README.md
-│
-├── helpers/
-│   └── utils.js              # helpers reutilizables (fecha, pace, etc.)
-│
-├── data/
-│   └── api.js                # capa HTTP cruda: fetch a API Express
-│
-├── ui/
-│   ├── data-layer.js         # decide origen: API real o LocalStorage fallback
-│   ├── form.js               # lógica del formulario: leer/validar/llenar/editar
-│   ├── render.js             # render del listado + resumen + chips
-│   └── index.js              # “pegamento”: conecta UI, data y render
-│
-└── server/                   # backend Node + Express (opcional)
-    ├── server.js
-    ├── db-mysql.js
-    └── sql/
-        ├── 001_schema.sql    # CREATE DATABASE/TABLE
-        ├── 002_seed.sql      # datos iniciales
-        └── 003_queries.sql   # consultas útiles
+## Tecnologías
 
----
-```
-🔄 Flujo de la UI
+| Capa | Tecnologías |
+| --- | --- |
+| Frontend | HTML5 semántico, CSS3, JavaScript ES Modules |
+| Persistencia demo | Web Storage API (`localStorage`) |
+| Backend | Node.js, Express, API REST |
+| Base de datos | MySQL, `mysql2` y scripts SQL |
+| Calidad | Node Test Runner, `npm audit`, GitHub Actions |
+
+## Arquitectura
+
 ```mermaid
-flowchart TD
-  U[Usuario] --> F[ui/form.js]
-  F --> I[ui/index.js]
-  I --> D[ui/data-layer.js]
-  D -->|si hay API| A[data/api.js]
-  D -->|si no| LS[localStorage]
-  A --> R[ui/render.js]
-  LS --> R
-  R --> UI[Pantalla]
+flowchart LR
+  UI[Interfaz accesible] --> FORM[Validación del formulario]
+  FORM --> DL[Capa de datos]
+  DL -->|Demo publicada| LS[(LocalStorage)]
+  DL -->|Entorno local| API[API REST]
+  API --> VALID[Validación backend]
+  VALID --> DB[(MySQL)]
 ```
-____________________________________________________________________________________
-▶️ Cómo ejecutar (solo front)
 
-1. Abrir el proyecto en VS Code.
+```text
+.
+├── index.html                 # estructura semántica de la aplicación
+├── style.css                  # diseño responsive y modo oscuro
+├── data/api.js                # cliente HTTP y healthcheck
+├── helpers/utils.js           # fecha, duración y cálculo de pace
+├── ui/
+│   ├── data-layer.js          # selección API o localStorage
+│   ├── form.js                # formulario, validación y edición
+│   ├── index.js               # coordinación de la interfaz
+│   └── render.js              # render seguro mediante textContent
+├── server/
+│   ├── db-mysql.js            # consultas parametrizadas
+│   ├── server.js              # rutas y manejo de errores
+│   ├── validation.js          # contrato de datos de la API
+│   ├── sql/                   # esquema, datos de ejemplo y consultas
+│   └── test/                  # pruebas del backend
+├── tests/                     # pruebas de utilidades frontend
+└── .github/workflows/ci.yml   # validación continua
+```
 
-2. Usar Live Server o abrir index.html directamente en el navegador.
+## Ejecutar la demo local
 
-3. Registrar entrenamientos desde el formulario.
+Los módulos ES necesitan un servidor HTTP; no conviene abrir `index.html` directamente.
 
-4. Los datos se guardan automáticamente en localStorage.
+```bash
+python -m http.server 5500 --bind 127.0.0.1
+```
 
-____________________________________________________________________________________
+Abrí `http://127.0.0.1:5500/`. Si necesitás forzar el modo demo:
 
-🗄️ Usar con API real (Express + MySQL)
+```text
+http://127.0.0.1:5500/?mode=local
+```
 
-1. Tener MySQL corriendo y crear BD/tablas con:
+## Ejecutar con Express y MySQL
 
+### 1. Crear la base de datos
+
+Ejecutá en MySQL, en este orden:
+
+```text
 server/sql/001_schema.sql
+server/sql/002_inserts.sql   # opcional: datos de ejemplo
+```
 
-server/sql/002_seed.sql
+### 2. Configurar variables de entorno
 
-2. Configurar credenciales en db-mysql.js:
+Dentro de `server/`, copiá `.env.example` como `.env` y reemplazá los valores de ejemplo:
 
-MYSQL_HOST, MYSQL_PORT, MYSQL_USER, MYSQL_PASS, MYSQL_DB
+```env
+MYSQL_HOST=localhost
+MYSQL_PORT=3306
+MYSQL_USER=root
+MYSQL_PASS=tu_password_local
+MYSQL_DB=mi_diario_carreras
+PORT=3000
+CORS_ORIGIN=http://127.0.0.1:5500,http://localhost:5500
+```
 
+El archivo `.env` está ignorado por Git y nunca debe publicarse.
 
-3. Instalar dependencias y levantar servidor:
+### 3. Instalar y levantar la API
 
+```bash
 cd server
-npm install
-node server.js
+npm ci
+npm start
+```
 
-4. Endpoints disponibles:
+Luego iniciá el frontend en el puerto `5500`. Si la API responde en
+`http://localhost:3000/api/health`, la interfaz cambia automáticamente a `API + MySQL`.
 
-GET /api/entrenamientos
+## Endpoints
 
-POST /api/entrenamientos
+| Método | Endpoint | Acción |
+| --- | --- | --- |
+| `GET` | `/api/health` | Estado de la API y MySQL |
+| `GET` | `/api/entrenamientos` | Lista paginada |
+| `GET` | `/api/entrenamientos/:id` | Detalle de una sesión |
+| `POST` | `/api/entrenamientos` | Crear una sesión |
+| `PUT` | `/api/entrenamientos/:id` | Actualizar una sesión |
+| `DELETE` | `/api/entrenamientos/:id` | Eliminar una sesión |
 
-PUT /api/entrenamientos/:id
+El archivo [`api.http`](api.http) incluye solicitudes de ejemplo para VS Code REST Client.
 
-DELETE /api/entrenamientos/:id
+## Pruebas y controles
 
-En index.html ya está configurado:
+```bash
+npm test
+npm run check
+npm audit --omit=dev --prefix server
+```
 
-<script>window.API_BASE = 'http://localhost:3000/api';</script>
+La integración continua ejecuta:
 
+- validación de sintaxis;
+- pruebas de duración, pace y fechas;
+- pruebas del contrato de la API;
+- auditoría de dependencias de producción.
 
-👉 Si la API responde, la UI muestra “Origen de datos: API (entrenamientos)”.
-👉 Si no, cae automáticamente a LocalStorage.
-_____________________________________________________________________________________
-🧪 Consistencia de nombres
+## Seguridad aplicada
 
-Todos los campos viajan con los mismos nombres en HTML → UI → API → BD:
+- Credenciales exclusivamente mediante variables de entorno.
+- Consultas SQL parametrizadas.
+- Restricción configurable de orígenes CORS.
+- Límite para cuerpos JSON y validación de longitudes.
+- Política de Seguridad de Contenido en el frontend.
+- Render de datos mediante `textContent` para impedir XSS almacenado.
+- Mensajes de error del servidor sin exponer detalles internos.
 
-fecha, tipo, distancia_km, duracion, intensidad,
-sentimiento, ciclo_menstrual, alimentacion_previa, descripcion
-______________________________________________________________________________________
+## Mejoras futuras
 
-🧩 Buenas prácticas aplicadas
+- Autenticación y separación de datos por usuario.
+- Filtros por actividad y rango de fechas.
+- Gráficos de evolución y exportación CSV.
+- Pruebas de integración de la API con una base temporal.
+- Despliegue independiente del backend y MySQL.
 
-✔️ Separación clara por capas
+## Autora
 
-✔️ Comentarios y secciones
+**Barbara Bernhard** — Licenciada en Turismo y Técnica Superior en Programación.
 
-✔️ Fallback seguro a localStorage
+- [GitHub](https://github.com/Barbyland)
+- [LinkedIn](https://www.linkedin.com/in/barbara-bernhard/)
 
-✔️ API REST limpia y consistente
-
-✔️ Integración de variables deportivas específicas (alimentación, ciclo menstrual)
-_______________________________________________________________________________________
-🚀 Próximos pasos
-
-🔜 Filtros por fecha y tipo
-
-🔜 Exportar a CSV
-
-🔜 Gráficos de evolución
-
----
-
-
-<p align="center">
-  Desarrollado con 💻 y pasión por <b>Barby Bernhard</b><br>
-  <em>Lic. en Turismo | Técnica Superior en Programación (TECLAB) | Runner & Cyclist 🏃‍♀️🚴‍♀️</em><br><br>
-  <em>Proyecto Final aprobado en la Práctica Profesionalizante del Instituto Técnico Superior Teclab.</em><br><br>
-  🌐 <a href="https://github.com/Barbyland" target="_blank">GitHub</a> |
-  💼 <a href="https://www.linkedin.com/in/barbara-bernhard/" target="_blank">LinkedIn</a>
-</p>
-
+Proyecto final aprobado en la Práctica Profesionalizante del Instituto Técnico Superior TECLAB.

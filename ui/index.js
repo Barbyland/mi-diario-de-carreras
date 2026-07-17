@@ -1,51 +1,58 @@
-// ui/index.js — pegamento UI
-import { apiOk } from '../data/api.js';
 import {
+  obtenerOrigenDatos,
   cargarEntradas,
   guardarEntrada,
   actualizarEntrada,
   eliminarEntrada
 } from './data-layer.js';
+import { initForm, UIForm } from './form.js';
+import { renderEntradas, setOrigen } from './render.js';
 
-function setOrigenText(text) {
-  const el = document.getElementById('origenDatos');
-  if (el) el.textContent = `Origen de datos: ${text}`;
+function setAppStatus(message, kind = 'info') {
+  const status = document.getElementById('appStatus');
+  if (!status) return;
+  status.textContent = message;
+  status.dataset.kind = kind;
 }
 
 async function refresh(callbacks) {
-  const entradas = await cargarEntradas();
-  const { renderEntradas } = await import('./render.js');
-  renderEntradas(entradas, callbacks);
+  const entries = await cargarEntradas();
+  renderEntradas(entries, callbacks);
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
-  // Origen visible
-  const originText = (await apiOk()) ? 'API (entrenamientos)' : 'LocalStorage';
-  setOrigenText(originText);
+  setOrigen(await obtenerOrigenDatos());
 
-  // Acciones
   const callbacks = {
-    onEdit: async (e) => {
-      const { UIForm } = await import('./form.js');
-      UIForm.enterEditMode(e);
+    onEdit(entry) {
+      UIForm.enterEditMode(entry);
     },
-    onDelete: async (e) => {
-      await eliminarEntrada(e.id);
-      await refresh(callbacks);
+    async onDelete(entry) {
+      try {
+        await eliminarEntrada(entry.id);
+        await refresh(callbacks);
+        setAppStatus('Registro eliminado.', 'success');
+      } catch (error) {
+        setAppStatus(`No se pudo eliminar: ${error.message}`, 'error');
+      }
     }
   };
 
-  // Form
-  const { initForm } = await import('./form.js');
   initForm({
-    onSave: async (payload, editingId) => {
+    async onSave(payload, editingId) {
       if (editingId) await actualizarEntrada(editingId, payload);
-      else           await guardarEntrada(payload);
+      else await guardarEntrada(payload);
       await refresh(callbacks);
+      setAppStatus(editingId ? 'Cambios guardados.' : 'Entrenamiento registrado.', 'success');
     },
-    onCancel: () => refresh(callbacks)
+    onCancel() {
+      setAppStatus('Edición cancelada.');
+    }
   });
 
-  // Primera carga
-  await refresh(callbacks);
+  try {
+    await refresh(callbacks);
+  } catch (error) {
+    setAppStatus(`No se pudieron cargar los registros: ${error.message}`, 'error');
+  }
 });

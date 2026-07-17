@@ -1,4 +1,6 @@
--- Inserts de ejemplo
+USE mi_diario_carreras;
+
+-- Datos de ejemplo para un entorno local de desarrollo.
 INSERT INTO entrenamientos 
   (fecha, tipo, distancia_km, duracion, intensidad, sentimiento, descripcion, ciclo_menstrual, alimentacion_previa, created_at)
 VALUES
