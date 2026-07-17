@@ -12,7 +12,7 @@
 </p>
 
 <p align="center">
-  <img src="img/banner.png" alt="Ilustración de Mi Diario de Carreras" width="760">
+  <img src="img/banner-sin-titulo.png" alt="Ilustración de Mi Diario de Carreras" width="760">
 </p>
 
 ## Descripción
